@@ -1,5 +1,5 @@
 {
-  "name": "yueye-rental",
+  "name": "yueye-rental-sys",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-to-print": "^2.15.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
