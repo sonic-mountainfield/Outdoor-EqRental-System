@@ -21,7 +21,6 @@ const TOUR_OPTIONS = [
 ];
 
 export default function CheckoutForm({ orderData, onBack }) {
-  // 表單資料狀態
   const [formData, setFormData] = useState({
     tour: '',
     name: '',
@@ -30,34 +29,35 @@ export default function CheckoutForm({ orderData, onBack }) {
     email: ''
   });
 
-  // 提交狀態
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // 處理輸入框改變
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // 處理訂單送出 (串接 SheetDB)
+  // 處理訂單送出 (串接 SheetDB 與 EmailJS)
   const handleSubmit = async (e) => {
     e.preventDefault(); 
     setIsSubmitting(true);
 
-    // 把裝備 ID 轉換成中文名稱，用逗號串接
-    const gearNamesString = orderData.gears.map(id => GEAR_NAME_MAP[id]).join(', ');
+    // 準備通用資料
+    const gearNamesString = orderData.gears ? orderData.gears.map(id => GEAR_NAME_MAP[id]).join(', ') : '';
+    const currentOrderId = `YY${Date.now()}`; // 產生唯一訂單編號
+    const planName = orderData.plan === 'adult9' ? '成人全套九件組' : orderData.plan === 'child9' ? '兒童全套九件組' : '成人自由選七件組';
 
-    const payload = {
+    // 1. 準備送到 SheetDB 的資料
+    const sheetPayload = {
       data: [
         {
-          "訂單編號": `YY${Date.now()}`, 
+          "訂單編號": currentOrderId, 
           "團名與日期": formData.tour,
           "姓名": formData.name,
           "電話": formData.phone,
           "性別": formData.gender,
           "Email": formData.email,
-          "選擇方案": orderData.plan === 'adult9' ? '成人全套' : orderData.plan === 'child9' ? '兒童全套' : '自由選七件',
+          "選擇方案": planName,
           "裝備清單": gearNamesString,
           "總金額": orderData.price,
           "訂單狀態": "待確認",
@@ -66,22 +66,48 @@ export default function CheckoutForm({ orderData, onBack }) {
       ]
     };
 
+    // 2. 準備送到 EmailJS 的資料 (對應我們剛剛在範本設定的 {{變數}})
+    const emailPayload = {
+      service_id: 'service_987gg3b',    // 📝 這裡要換！(例如: service_abc123)
+      template_id: 'template_2u17gz6',  // 📝 這裡要換！(例如: template_xyz789)
+      user_id: 'gAivgFufM8L44AAow',       // 📝 這裡要換！(從 Account > General 拿到的 Public Key)
+      template_params: {
+        to_email: formData.email,
+        to_name: formData.name,
+        order_id: currentOrderId,
+        tour: formData.tour,
+        plan: planName,
+        gears: gearNamesString,
+        price: orderData.price
+      }
+    };
+
     try {
-      // ⚠️ 請記得把下方的 URL 換成你自己的 SheetDB API 網址！
-      const response = await fetch('https://sheetdb.io/api/v1/你的API代碼', {
+      // 第一關：把資料存進 Google 表單 (SheetDB)
+      // 📝 下面這行網址要換成你的 SheetDB API 網址！
+      const sheetResponse = await fetch('https://sheetdb.io/api/v1/替換成你的API代碼', { 
         method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(sheetPayload)
       });
       
-      const result = await response.json();
+      if (!sheetResponse.ok) throw new Error('資料庫儲存失敗，請檢查 SheetDB 設定');
+
+      // 第二關：如果資料庫儲存成功，接著呼叫 EmailJS 寄出確認信
+      const emailResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailPayload)
+      });
+
+      if (!emailResponse.ok) throw new Error('信件寄送失敗，請檢查 EmailJS 代碼是否正確');
+
+      // 兩關都成功，顯示成功畫面！
       setIsSuccess(true);
+
     } catch (error) {
-      console.error("送出失敗:", error);
-      alert("抱歉，系統發生錯誤，請稍後再試。");
+      console.error("處理失敗:", error);
+      alert("抱歉，系統發生錯誤：" + error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -110,7 +136,6 @@ export default function CheckoutForm({ orderData, onBack }) {
         <h1 className="text-2xl font-bold text-gray-800">填寫個人資料</h1>
       </div>
 
-      {/* --- 訂單摘要小卡 (更新版：所有方案皆顯示裝備清單) --- */}
       <div className="bg-emerald-50 p-5 rounded-lg mb-6 border border-emerald-100 flex justify-between items-start shadow-sm">
         <div className="flex-1">
           <span className="text-sm text-gray-500 block mb-1">已選方案</span>
@@ -118,7 +143,6 @@ export default function CheckoutForm({ orderData, onBack }) {
             {orderData.plan === 'adult9' ? '成人全套九件組' : orderData.plan === 'child9' ? '兒童全套九件組' : '成人自由選七件組'}
           </span>
           
-          {/* 現在不管什麼方案，只要有裝備資料就會顯示清單 */}
           {orderData.gears && orderData.gears.length > 0 && (
             <div className="mt-3 bg-emerald-100/50 rounded-md p-3 border border-emerald-200/50">
               <span className="text-sm font-bold text-emerald-800 block mb-1">包含裝備：</span>
@@ -140,7 +164,6 @@ export default function CheckoutForm({ orderData, onBack }) {
         </div>
       </div>
 
-      {/* 資料填寫表單 */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">跟團資訊 *</label>
@@ -218,7 +241,7 @@ export default function CheckoutForm({ orderData, onBack }) {
             className={`w-full py-4 rounded-lg font-bold text-lg text-white transition-all shadow-md
               ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'}`}
           >
-            {isSubmitting ? '訂單送出中...' : '確認無誤，送出訂單'}
+            {isSubmitting ? '訂單送出中 (請稍候)...' : '確認無誤，送出訂單'}
           </button>
         </div>
       </form>
