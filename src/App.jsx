@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import GearSelection from './components/GearSelection';
 import CheckoutForm from './components/CheckoutForm';
+import AdminOrders from './components/AdminOrders'; // 引入你的管理員元件
 
 export default function App() {
   const [currentStep, setCurrentStep] = useState(1);
   const [orderData, setOrderData] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // 初始化時檢查網址參數
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'admin') {
+      setIsAdmin(true);
+    }
+  }, []);
 
   const handleNextStep = (data) => {
     setOrderData(data);
@@ -14,6 +24,11 @@ export default function App() {
   const handleBack = () => {
     setCurrentStep(1);
   };
+
+  // 如果是管理員模式，直接顯示後台
+  if (isAdmin) {
+    return <AdminOrders />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
