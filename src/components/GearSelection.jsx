@@ -1,16 +1,27 @@
 import React, { useState } from 'react';
 
-// 裝備資料清單 (包含真實圖片網址)
+// 1. 引入本地圖片 (⚠️ 請確認這裡的檔名與你上傳的完全一致！)
+import imgBackpackCover from '../assets/images/gear/backpack_cover.png';
+import imgRaincoat from '../assets/images/gear/raincoat.png';
+import imgRainPants from '../assets/images/gear/rain_pants.png';
+import imgDownJacket from '../assets/images/gear/down_jacket.png';
+import imgLargeBackpack from '../assets/images/gear/large_backpack.png';
+import imgTrekkingPole from '../assets/images/gear/trekking_pole.png';
+import imgGaiters from '../assets/images/gear/gaiters.png';
+import imgHeadlamp from '../assets/images/gear/headlamp.png';
+import imgHikingBoots from '../assets/images/gear/hiking_boots.png';
+
+// 2. 更新裝備資料清單 (使用上方引入的圖片變數)
 const GEAR_ITEMS = [
-  { id: 1, name: '背包套', image: 'https://images.unsplash.com/photo-1621245785055-635b54ff52ff?q=80&w=600&auto=format&fit=crop' },
-  { id: 2, name: '雨衣', image: 'https://images.unsplash.com/photo-1620921430046-e5758b902e5b?q=80&w=600&auto=format&fit=crop' },
-  { id: 3, name: '雨褲', image: 'https://images.unsplash.com/photo-1616086749968-3e4b7b514e66?q=80&w=600&auto=format&fit=crop' },
-  { id: 4, name: '羽絨外套', image: 'https://images.unsplash.com/photo-1611036069925-5421c4b81c7f?q=80&w=600&auto=format&fit=crop' },
-  { id: 5, name: '大背包', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=600&auto=format&fit=crop' },
-  { id: 6, name: '登山杖', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=600&auto=format&fit=crop' },
-  { id: 7, name: '綁腿', image: 'https://images.unsplash.com/photo-1617188151246-8149f1f008f1?q=80&w=600&auto=format&fit=crop' },
-  { id: 8, name: '頭燈(附電池)', image: 'https://images.unsplash.com/photo-1613149495116-36869e5d4a4d?q=80&w=600&auto=format&fit=crop' },
-  { id: 9, name: '登山鞋', image: 'https://images.unsplash.com/photo-1520639889313-7272af179a61?q=80&w=600&auto=format&fit=crop' },
+  { id: 1, name: '背包套', image: imgBackpackCover },
+  { id: 2, name: '雨衣', image: imgRaincoat },
+  { id: 3, name: '雨褲', image: imgRainPants },
+  { id: 4, name: '羽絨外套', image: imgDownJacket },
+  { id: 5, name: '大背包', image: imgLargeBackpack },
+  { id: 6, name: '登山杖', image: imgTrekkingPole },
+  { id: 7, name: '綁腿', image: imgGaiters },
+  { id: 8, name: '頭燈(附電池)', image: imgHeadlamp },
+  { id: 9, name: '登山鞋', image: imgHikingBoots },
 ];
 
 export default function GearSelection({ onNextStep }) {
@@ -65,7 +76,6 @@ export default function GearSelection({ onNextStep }) {
     };
     // 呼叫父元件傳進來的 function，進入第二頁
     if(onNextStep) onNextStep(orderData);
-    console.log("前往下一步，訂單資料：", orderData);
   };
 
   return (
@@ -132,6 +142,7 @@ export default function GearSelection({ onNextStep }) {
                   className={`relative flex flex-col items-center p-2 rounded-xl border-2 cursor-pointer transition-all overflow-hidden
                     ${isSelected ? 'border-emerald-500 bg-emerald-50 shadow-md' : 'border-gray-200 hover:border-emerald-300 hover:shadow-sm'}`}
                 >
+                  {/* 顯示引入的圖片 */}
                   <img src={item.image} alt={item.name} className="w-full h-24 object-cover rounded-md mb-2" />
                   <span className={`text-sm font-medium ${isSelected ? 'text-emerald-700' : 'text-gray-700'}`}>{item.name}</span>
                   
