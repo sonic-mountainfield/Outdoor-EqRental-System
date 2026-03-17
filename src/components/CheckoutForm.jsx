@@ -53,7 +53,7 @@ export default function CheckoutForm({ orderData, onBack }) {
 
     try {
       // 2. 呼叫 SheetDB API (請將下方的 URL 換成你自己的 SheetDB API 網址)
-      /* const response = await fetch('https://sheetdb.io/api/v1/你的API代碼', {
+      /* const response = await fetch('https://sheetdb.io/api/v1/0r2rfy0cdm7yk', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
