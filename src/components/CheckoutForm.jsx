@@ -83,9 +83,8 @@ export default function CheckoutForm({ orderData, onBack }) {
     };
 
     try {
-      // 第一關：把資料存進 Google 表單 (SheetDB)
-      // 📝 下面這行網址要換成你的 SheetDB API 網址！
-      const sheetResponse = await fetch('https://sheetdb.io/api/v1/替換成你的API代碼', { 
+      // 第一關：把資料存進 Google 表單 (SheetDB - 已經幫你替換好網址了！)
+      const sheetResponse = await fetch('https://sheetdb.io/api/v1/0r2rfy0cdm7yk', { 
         method: 'POST',
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify(sheetPayload)
