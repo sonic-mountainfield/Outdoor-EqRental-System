@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
 
-// 假設這是你提供的近期出團列表
+// 新增：裝備 ID 對應名稱的字典，用來把傳遞過來的數字轉換回中文名稱
+const GEAR_NAME_MAP = {
+  1: '背包套',
+  2: '雨衣',
+  3: '雨褲',
+  4: '羽絨外套',
+  5: '大背包',
+  6: '登山杖',
+  7: '綁腿',
+  8: '頭燈(附電池)',
+  9: '登山鞋',
+};
+
+// 近期出團列表
 const TOUR_OPTIONS = [
   "[2026/07/01] 富士山攻頂三天兩夜 A團",
   "[2026/07/15] 富士山攻頂三天兩夜 B團",
@@ -17,7 +30,7 @@ export default function CheckoutForm({ orderData, onBack }) {
     email: ''
   });
 
-  // 提交狀態 (避免重複點擊)
+  // 提交狀態
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -29,21 +42,23 @@ export default function CheckoutForm({ orderData, onBack }) {
 
   // 處理訂單送出 (串接 SheetDB)
   const handleSubmit = async (e) => {
-    e.preventDefault(); // 防止畫面重整
+    e.preventDefault(); 
     setIsSubmitting(true);
 
-    // 1. 準備要送到 SheetDB 的資料格式
+    // 把裝備 ID 轉換成中文名稱，再用逗號串接起來準備存入資料庫
+    const gearNamesString = orderData.gears.map(id => GEAR_NAME_MAP[id]).join(', ');
+
     const payload = {
       data: [
         {
-          "訂單編號": `YY${Date.now()}`, // 用時間戳記簡單產生一組編號
+          "訂單編號": `YY${Date.now()}`, 
           "團名與日期": formData.tour,
           "姓名": formData.name,
           "電話": formData.phone,
           "性別": formData.gender,
           "Email": formData.email,
-          "選擇方案": orderData.plan,
-          "裝備清單": orderData.gears.join(', '), // 把陣列轉成字串，例如 "1, 3, 5, 6"
+          "選擇方案": orderData.plan === 'adult9' ? '成人全套' : orderData.plan === 'child9' ? '兒童全套' : '自由選七件',
+          "裝備清單": gearNamesString, // 這裡存入轉換好的中文清單
           "總金額": orderData.price,
           "訂單狀態": "待確認",
           "建立時間": new Date().toLocaleString()
@@ -52,8 +67,8 @@ export default function CheckoutForm({ orderData, onBack }) {
     };
 
     try {
-      // 2. 呼叫 SheetDB API (請將下方的 URL 換成你自己的 SheetDB API 網址)
-      /* const response = await fetch('https://sheetdb.io/api/v1/0r2rfy0cdm7yk', {
+      // ⚠️ 請記得把下方的 URL 換成你自己的 SheetDB API 網址！
+      const response = await fetch('https://sheetdb.io/api/v1/你的API代碼', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -61,13 +76,8 @@ export default function CheckoutForm({ orderData, onBack }) {
         },
         body: JSON.stringify(payload)
       });
+      
       const result = await response.json();
-      */
-
-      // 模擬 API 延遲 (測試用，正式上線請刪除這行並解開上面的註解)
-      await new Promise(resolve => setTimeout(resolve, 1500)); 
-
-      // 3. 成功後的處理
       setIsSuccess(true);
     } catch (error) {
       console.error("送出失敗:", error);
@@ -77,7 +87,6 @@ export default function CheckoutForm({ orderData, onBack }) {
     }
   };
 
-  // 如果成功，顯示成功畫面
   if (isSuccess) {
     return (
       <div className="max-w-md mx-auto p-8 mt-10 bg-white rounded-xl shadow-lg text-center border-t-4 border-emerald-500">
@@ -101,17 +110,33 @@ export default function CheckoutForm({ orderData, onBack }) {
         <h1 className="text-2xl font-bold text-gray-800">填寫個人資料</h1>
       </div>
 
-      {/* 訂單摘要小卡 */}
-      <div className="bg-emerald-50 p-4 rounded-lg mb-6 border border-emerald-100 flex justify-between items-center">
-        <div>
-          <span className="text-sm text-gray-500 block">已選方案</span>
-          <span className="font-bold text-emerald-800">
+      {/* --- 訂單摘要小卡 (更新版：支援顯示自由選清單) --- */}
+      <div className="bg-emerald-50 p-5 rounded-lg mb-6 border border-emerald-100 flex justify-between items-start shadow-sm">
+        <div className="flex-1">
+          <span className="text-sm text-gray-500 block mb-1">已選方案</span>
+          <span className="font-bold text-emerald-800 text-lg">
             {orderData.plan === 'adult9' ? '成人全套九件組' : orderData.plan === 'child9' ? '兒童全套九件組' : '成人自由選七件組'}
           </span>
+          
+          {/* 只有在選「自由選七件」的時候，才顯示這個裝備清單區塊 */}
+          {orderData.plan === 'adult7' && orderData.gears && (
+            <div className="mt-3 bg-emerald-100/50 rounded-md p-3 border border-emerald-200/50">
+              <span className="text-sm font-bold text-emerald-800 block mb-1">包含裝備：</span>
+              <ul className="grid grid-cols-2 gap-x-2 gap-y-1">
+                {orderData.gears.map(gearId => (
+                  <li key={gearId} className="text-sm text-emerald-700 flex items-center">
+                    <span className="mr-1.5 text-emerald-500 text-xs">✓</span>
+                    {GEAR_NAME_MAP[gearId]}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
-        <div className="text-right">
-          <span className="text-sm text-gray-500 block">總金額</span>
-          <span className="font-bold text-xl text-emerald-600">NT$ {orderData.price}</span>
+        
+        <div className="text-right ml-4">
+          <span className="text-sm text-gray-500 block mb-1">總金額</span>
+          <span className="font-bold text-2xl text-emerald-600">NT$ {orderData.price}</span>
         </div>
       </div>
 
