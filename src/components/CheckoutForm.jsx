@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-// 新增：裝備 ID 對應名稱的字典，用來把傳遞過來的數字轉換回中文名稱
+// 裝備 ID 對應名稱的字典
 const GEAR_NAME_MAP = {
   1: '背包套',
   2: '雨衣',
@@ -45,7 +45,7 @@ export default function CheckoutForm({ orderData, onBack }) {
     e.preventDefault(); 
     setIsSubmitting(true);
 
-    // 把裝備 ID 轉換成中文名稱，再用逗號串接起來準備存入資料庫
+    // 把裝備 ID 轉換成中文名稱，用逗號串接
     const gearNamesString = orderData.gears.map(id => GEAR_NAME_MAP[id]).join(', ');
 
     const payload = {
@@ -58,7 +58,7 @@ export default function CheckoutForm({ orderData, onBack }) {
           "性別": formData.gender,
           "Email": formData.email,
           "選擇方案": orderData.plan === 'adult9' ? '成人全套' : orderData.plan === 'child9' ? '兒童全套' : '自由選七件',
-          "裝備清單": gearNamesString, // 這裡存入轉換好的中文清單
+          "裝備清單": gearNamesString,
           "總金額": orderData.price,
           "訂單狀態": "待確認",
           "建立時間": new Date().toLocaleString()
@@ -110,7 +110,7 @@ export default function CheckoutForm({ orderData, onBack }) {
         <h1 className="text-2xl font-bold text-gray-800">填寫個人資料</h1>
       </div>
 
-      {/* --- 訂單摘要小卡 (更新版：支援顯示自由選清單) --- */}
+      {/* --- 訂單摘要小卡 (更新版：所有方案皆顯示裝備清單) --- */}
       <div className="bg-emerald-50 p-5 rounded-lg mb-6 border border-emerald-100 flex justify-between items-start shadow-sm">
         <div className="flex-1">
           <span className="text-sm text-gray-500 block mb-1">已選方案</span>
@@ -118,8 +118,8 @@ export default function CheckoutForm({ orderData, onBack }) {
             {orderData.plan === 'adult9' ? '成人全套九件組' : orderData.plan === 'child9' ? '兒童全套九件組' : '成人自由選七件組'}
           </span>
           
-          {/* 只有在選「自由選七件」的時候，才顯示這個裝備清單區塊 */}
-          {orderData.plan === 'adult7' && orderData.gears && (
+          {/* 現在不管什麼方案，只要有裝備資料就會顯示清單 */}
+          {orderData.gears && orderData.gears.length > 0 && (
             <div className="mt-3 bg-emerald-100/50 rounded-md p-3 border border-emerald-200/50">
               <span className="text-sm font-bold text-emerald-800 block mb-1">包含裝備：</span>
               <ul className="grid grid-cols-2 gap-x-2 gap-y-1">
