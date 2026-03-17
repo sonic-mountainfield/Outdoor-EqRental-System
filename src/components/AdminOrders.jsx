@@ -96,7 +96,7 @@ export default function AdminOrders() {
           </div>
 
           <div className="mt-32 flex justify-between">
-            <div className="border-t-2 border-black pt-2 w-64 text-center text-lg">客戶簽名 (領取確認)</div>
+            <div className="border-t-2 border-black pt-2 w-64 text-center text-lg">客戶簽名 (尺寸確認)</div>
             <div className="border-t-2 border-black pt-2 w-64 text-center text-lg">岳野登山 經手人簽章</div>
           </div>
           
