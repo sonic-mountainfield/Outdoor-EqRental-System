@@ -134,7 +134,7 @@ export default function AdminOrders() {
                     </div>
                     <p className="mb-1">服裝：(男) S/M/L/XL/XXL ｜ (女) S/M/L/XL</p>
                     <p className="mb-3">確認尺寸：<span className="inline-block w-32 border-b border-black"></span></p>
-                    <p className="mb-1">鞋子：(男) 25.5-31.0 ｜ (女) 23.5-25.5</p>
+                    <p className="mb-1">鞋子：(男) 25.5-31.0 ｜ (女) 23.5-25.5  (公分)</p>
                     <p>確認尺寸：<span className="inline-block w-32 border-b border-black"></span></p>
                   </div>
                   {/* 兒童用 */}
@@ -146,7 +146,7 @@ export default function AdminOrders() {
                     </div>
                     <p className="mb-1">服裝：110 / 120 / 130 / 140 / 150</p>
                     <p className="mb-3">確認尺寸：<span className="inline-block w-32 border-b border-black"></span></p>
-                    <p className="mb-1">鞋子：18.0 - 25.0</p>
+                    <p className="mb-1">鞋子：18.0 - 25.0 (公分)</p>
                     <p>確認尺寸：<span className="inline-block w-32 border-b border-black"></span></p>
                   </div>
                 </div>
