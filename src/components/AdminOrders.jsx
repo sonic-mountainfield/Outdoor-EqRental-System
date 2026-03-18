@@ -6,193 +6,145 @@ export default function AdminOrders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const printRef = useRef();
 
-  // 📝 這裡請確保與你的 SheetDB API 網址一致
   const SHEETDB_URL = 'https://sheetdb.io/api/v1/0r2rfy0cdm7yk';
 
-  // 1. 從資料庫獲取訂單
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const res = await fetch(SHEETDB_URL);
         const data = await res.json();
         setOrders(Array.isArray(data) ? data.reverse() : []);
-      } catch (e) { 
-        console.error("抓取失敗", e); 
-      }
+      } catch (e) { console.error("抓取失敗", e); }
     };
     fetchOrders();
   }, []);
 
-  // 2. 設定列印功能
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     documentTitle: `岳野登山合約_${selectedOrder?.姓名}`,
   });
 
-  // 3. 準備列印資料並執行
   const triggerPrint = (order) => {
     setSelectedOrder(order);
-    // 給予 300ms 緩衝確保資料填入 DOM
     setTimeout(() => { handlePrint(); }, 300);
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 p-4 sm:p-8 font-sans">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-8 font-sans">
       <div className="max-w-5xl mx-auto">
-        
-        {/* 後台頂部管理列 */}
-        <div className="flex justify-between items-center mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <span className="bg-emerald-600 text-white p-1 rounded">⛰️</span> 岳野登山後台管理
-            </h1>
-            <p className="text-xs text-gray-400 mt-1">租賃系統 v1.0 | 合約列印模式</p>
-          </div>
-          <button 
-            onClick={() => window.location.href='/'} 
-            className="text-sm font-medium text-emerald-700 bg-emerald-50 px-4 py-2 rounded-lg hover:bg-emerald-100 transition-all border border-emerald-100"
-          >
-            ← 返回客戶預約頁
-          </button>
+        <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow-sm">
+          <h1 className="text-xl font-bold text-gray-800">岳野登山 - 租賃管理系統</h1>
+          <button onClick={() => window.location.href='/'} className="text-sm bg-emerald-50 text-emerald-700 px-4 py-2 rounded-lg border border-emerald-100 font-bold">返回首頁</button>
         </div>
 
-        {/* 訂單列表表格 */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-gray-50 border-b border-gray-100">
+            <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="p-4 text-sm font-bold text-gray-600">訂單編號/時間</th>
-                <th className="p-4 text-sm font-bold text-gray-600">承租人/行程</th>
-                <th className="p-4 text-sm font-bold text-gray-600">金額</th>
+                <th className="p-4 text-sm font-bold text-gray-600">承租人</th>
+                <th className="p-4 text-sm font-bold text-gray-600">行程</th>
                 <th className="p-4 text-sm font-bold text-gray-600 text-right">操作</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-emerald-50 transition-colors">
-                  <td className="p-4">
-                    <div className="text-xs font-mono text-gray-400">{order.訂單編號}</div>
-                    <div className="text-[10px] text-gray-400 mt-1">{order.建立時間}</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="font-bold text-gray-800">{order.姓名}</div>
-                    <div className="text-xs text-gray-500 truncate max-w-xs">{order.團名與日期}</div>
-                  </td>
-                  <td className="p-4">
-                    <span className="font-bold text-emerald-600">NT$ {order.總金額}</span>
-                  </td>
+                <tr key={i} className="border-b hover:bg-emerald-50 transition-colors">
+                  <td className="p-4 font-bold">{order.姓名}</td>
+                  <td className="p-4 text-sm text-gray-600">{order.團名與日期}</td>
                   <td className="p-4 text-right">
-                    <button 
-                      onClick={() => triggerPrint(order)} 
-                      className="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-emerald-700 active:scale-95 transition-all"
-                    >
-                      🖨️ 列印合約
+                    <button onClick={() => triggerPrint(order)} className="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-emerald-700">
+                      🖨️ 列印兩頁合約 (含條款)
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {orders.length === 0 && (
-            <div className="p-20 text-center text-gray-400 italic">目前尚無訂單資料</div>
-          )}
         </div>
       </div>
 
       {/* ========================================================= */}
-      {/* 📥 壓縮版 A4 租賃合約 (僅在列印時顯示) */}
+      {/* 📥 列印版型 (兩頁式) */}
       {/* ========================================================= */}
       <div style={{ display: 'none' }}>
-        <div ref={printRef} className="p-10 text-black font-sans leading-snug bg-white" style={{ width: '210mm' }}>
+        <div ref={printRef} className="text-black font-sans leading-tight">
           
-          {/* 1. 頁首標題 */}
-          <div className="flex justify-between items-end border-b-4 border-black pb-2 mb-4">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tighter">戶外用品租賃合約書</h1>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Outdoor Equipment Rental Agreement</p>
+          {/* --- 第一頁：概要與核對單 --- */}
+          <div className="p-10 mb-20" style={{ minHeight: '297mm' }}>
+            <div className="border-b-4 border-black pb-2 mb-6 flex justify-between items-end">
+              <h1 className="text-2xl font-bold">戶外用品租賃確認單 (概要)</h1>
+              <p className="text-xs font-mono">NO: {selectedOrder?.訂單編號}</p>
             </div>
-            <div className="text-right">
-              <p className="text-xs font-bold">訂單編號：{selectedOrder?.訂單編號}</p>
-              <p className="text-[9px] text-gray-400 italic">列印日期：{new Date().toLocaleDateString()}</p>
+
+            <div className="grid grid-cols-2 gap-4 mb-6 text-sm bg-gray-50 p-4 rounded border">
+              <p><strong>承租人：</strong> {selectedOrder?.姓名}</p>
+              <p className="text-right"><strong>預約日期：</strong> {selectedOrder?.建立時間?.split(' ')[0]}</p>
+              <p><strong>電話：</strong> {selectedOrder?.電話}</p>
+              <p className="text-right"><strong>行程：</strong> {selectedOrder?.團名與日期}</p>
             </div>
-          </div>
-          
-          {/* 2. 客戶與行程資料區 */}
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1 mb-4 text-xs bg-gray-50 p-3 rounded border border-gray-200">
-            <p><strong>承租人姓名：</strong> <span className="text-base font-bold underline px-1">{selectedOrder?.姓名}</span></p>
-            <p className="text-right"><strong>預約日期：</strong> {selectedOrder?.建立時間?.split(' ')[0]}</p>
-            <p><strong>聯絡電話：</strong> {selectedOrder?.電話}</p>
-            <p className="text-right"><strong>參加行程：</strong> {selectedOrder?.團名與日期}</p>
+
+            {/* 直式核對清單 */}
+            <div className="border-2 border-black p-4 rounded-md mb-6">
+              <h3 className="font-bold text-sm bg-black text-white px-2 py-1 mb-3 inline-block">裝備核對 Checklist</h3>
+              <div className="grid grid-cols-2 gap-x-10 gap-y-2 mb-4">
+                {selectedOrder?.裝備清單?.split(', ').map((item, index) => (
+                  <div key={index} className="flex items-center border-b border-gray-100 py-1.5">
+                    <div className="w-5 h-5 border-2 border-black mr-3 flex-shrink-0 bg-white"></div>
+                    <span className="text-base font-medium">{item}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-right text-2xl font-black pt-2 border-t border-black">合計金額：NT$ {selectedOrder?.總金額}</p>
+            </div>
+
+            {/* 雙語取消規定概要 */}
+            <div className="bg-red-50 p-4 border border-red-200 rounded mb-6">
+              <h4 className="text-xs font-bold text-red-800 mb-2">【キャンセル規定 / 取消規定】</h4>
+              <ul className="text-[11px] text-red-700 space-y-1">
+                <li>● 20日前：10% | ● 7日前：50% | ● 3日前～當日：100% (不退款)</li>
+                <li className="italic opacity-80">※ 詳細條款請參閱第二頁「第9條」。</li>
+              </ul>
+            </div>
+
+            {/* 簽署確認 */}
+            <div className="mt-16 text-sm text-gray-700 mb-10">
+              <p>承租人聲明：本人已現場完成裝備測試，確認尺寸合適且功能正常，並同意本合約(含背面/第二頁)之所有租賃條款。</p>
+            </div>
+
+            <div className="flex justify-between mt-10 px-4">
+              <div className="border-t-2 border-black pt-2 w-64 text-center font-bold text-lg">承租人簽署 (尺寸確認)</div>
+              <div className="border-t-2 border-black pt-2 w-64 text-center font-bold text-lg">岳野登山 經手人簽章</div>
+            </div>
           </div>
 
-          {/* 3. 裝備核對清單 (直式勾選區) */}
-          <div className="border-2 border-black p-4 rounded-md mb-4 bg-white shadow-sm">
-            <div className="flex justify-between items-center border-b border-gray-200 pb-1 mb-3">
-              <h3 className="font-bold text-sm bg-black text-white px-2 py-0.5">裝備核對清單 Checklist</h3>
-              <p className="text-xs"><strong>方案內容：</strong> {selectedOrder?.選擇方案}</p>
+          {/* --- 第二頁：正式合約條款 (強制度分頁) --- */}
+          <div className="p-10 border-t-2 border-dashed border-gray-300" style={{ minHeight: '297mm', pageBreakBefore: 'always' }}>
+            <h2 className="text-center text-xl font-bold mb-6 underline">SORANOSHITA 戶外用品租賃合約條款</h2>
+            <div className="text-[10px] text-gray-700 grid grid-cols-1 gap-4 leading-relaxed">
+              <div className="space-y-3">
+                <p><strong>第1條 (合約目的)</strong>：SORANOSHITA（甲方）出租裝備予乙方，乙方應於租賃期滿歸還。</p>
+                <p><strong>第2條 (租賃物品)</strong>：詳見附件核對清單。</p>
+                <p><strong>第3條 (租賃期間)</strong>：依預約日期配送與歸還，乙方應依指定方式按時歸還。</p>
+                <p><strong>第4條 (租金)</strong>：乙方應於指定期限前支付約定租金。</p>
+                <p><strong>第5條 (配送與歸還)</strong>：由Yamato運輸宅配進行。無需清洗，依原包裝狀態歸還。</p>
+                <p><strong>第6條 (使用注意事項)</strong>：乙方應盡善良管理人注意義務。嚴禁轉租、改造或非原用途使用。</p>
+                <p><strong>第7條 (損壞、污損、遺失)</strong>：故意或過失造成損壞遺失時，應賠償修理費或原價金額。包含損傷保險，但遺失不在保險範圍。</p>
+                <p><strong>第8條 (延遲費用)</strong>：超過租賃期間歸還，應支付延遲費用。</p>
+                <p><strong>第9條 (取消)</strong>：出發日20天前(10%)、7天前(50%)、3天前起至當日(100%)。</p>
+                <p><strong>第10條 (免責事項)</strong>：因使用裝備造成之第三方損害，除甲方重大過失外不負責任。</p>
+                <p><strong>第11條 (個人資料)</strong>：僅用於履行合約及服務改善，受個資法保護。</p>
+                <p><strong>第12條 (合約解除)</strong>：乙方違約時，甲方可不經催告解除合約並要求歸還。</p>
+                <p><strong>第13條 (管轄法院)</strong>：爭議以甲方所在地法院為專屬合意管轄法院。</p>
+              </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-x-10 gap-y-1.5 mb-2">
-              {selectedOrder?.裝備清單?.split(', ').map((item, index) => (
-                <div key={index} className="flex items-center border-b border-gray-100 py-1">
-                  {/* 核對小方框 */}
-                  <div className="w-4 h-4 border-2 border-black mr-3 flex-shrink-0 bg-white"></div> 
-                  <span className="text-sm font-medium text-gray-700">{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-right text-lg font-black pt-2 border-t border-dotted border-gray-400 mt-2">
-              合計租金金額：<span className="text-2xl">NT$ {selectedOrder?.總金額}</span>
+            <div className="mt-10 p-4 border rounded text-[9px] text-gray-500">
+              <p>【甲方資訊】</p>
+              <p>地址：〒403-0017 日本山梨縣富士吉田市新西原5-2-1</p>
+              <p>公司名稱：SORANOSHITA股份有限公司 | 代表人：代表董事代表</p>
             </div>
           </div>
 
-          {/* 4. キャンセル規定 / 取消規定 (中日雙語) */}
-          <div className="bg-red-50 p-3 border border-red-200 rounded-md mb-4">
-            <h4 className="text-[11px] font-bold text-red-800 mb-1">【キャンセル規定 / 取消規定】</h4>
-            <ul className="text-[10px] text-red-700 space-y-1 list-disc pl-4 leading-tight">
-              <li>
-                出発日の20日前までのキャンセル：レンタル料の10％を申し受けます。<br/>
-                <span className="text-[9px] opacity-75">(出發前 20 日以上取消：酌收租金 10% 為手續費)</span>
-              </li>
-              <li>
-                出発日の7日前までのキャンセル：レンタル料の50％を申し受けます。<br/>
-                <span className="text-[9px] opacity-75">(出發前 7 日以上取消：酌收租金 50% 為手續費)</span>
-              </li>
-              <li>
-                出発日の3日前以降（当日含む）のキャンセル：レンタル料は返金不可となります。<br/>
-                <span className="text-[9px] opacity-75">(出發前 3 日內及當日取消：租金恕不退還)</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* 5. 租賃合約條款 */}
-          <div className="p-3 border border-gray-300 rounded-md mb-6 bg-white">
-            <h4 className="text-[11px] font-bold mb-1 underline">租賃合約條款 (Rental Terms)</h4>
-            <ol className="text-[9px] text-gray-600 space-y-1 list-decimal pl-4 leading-normal">
-              <li>承租人已於現場完成裝備測試，確認尺寸合適且功能正常，並由雙方核對數量無誤。</li>
-              <li>裝備若發生非正常磨損之損壞、遺失或失竊，承租人同意依原價之 70% 進行賠償。</li>
-              <li>承租人提供之護照資料僅供報名行程、申請保險及入山證使用，岳野登山負保密責任。</li>
-              <li>裝備領取後，若因個人因素提前歸還，恕不退還剩餘天數之租金。</li>
-            </ol>
-          </div>
-
-          {/* 6. 簽署區塊 */}
-          <div className="mt-12 flex justify-between px-2">
-            <div className="border-t-2 border-black pt-1 w-64 text-center">
-              <p className="text-sm font-bold">承租者簽署 (尺寸與條款確認)</p>
-              <p className="text-[10px] text-gray-400 mt-1 italic italic">Customer Signature</p>
-            </div>
-            <div className="border-t-2 border-black pt-1 w-64 text-center">
-              <p className="text-sm font-bold">岳野登山 經手人簽章</p>
-              <p className="text-[10px] text-gray-400 mt-1 italic italic">Staff Signature</p>
-            </div>
-          </div>
-          
-          {/* 7. 腳註 */}
-          <div className="mt-10 text-[8px] text-gray-400 text-center border-t border-gray-100 pt-2">
-            岳野登山公司 | 專業富士山、各國健行行程規劃與裝備租賃服務
-          </div>
         </div>
       </div>
     </div>
