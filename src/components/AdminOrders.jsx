@@ -37,7 +37,7 @@ export default function AdminOrders() {
             <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
               <span className="bg-emerald-600 text-white p-1 rounded">⛰️</span> 岳野登山後台管理
             </h1>
-            <p className="text-xs text-gray-400 mt-1">租賃系統 v2.0 | 雙頁合約模式</p>
+            <p className="text-xs text-gray-400 mt-1">租賃系統 v2.1 | 雙頁連動合約模式</p>
           </div>
           <button onClick={() => window.location.href='/'} className="text-sm font-medium text-emerald-700 bg-emerald-50 px-4 py-2 rounded-lg hover:bg-emerald-100 transition-all border border-emerald-100">
             ← 返回客戶預約頁
@@ -161,14 +161,20 @@ export default function AdminOrders() {
               </div>
             </div>
 
-            {/* 第一頁底部：換頁簽署提示 */}
-            <div className="border-t-4 border-gray-800 pt-6 mt-6 text-center">
-              <p className="text-xl font-black text-gray-800 tracking-widest mb-2">
-                ➡ 正式合約條款將於第二頁簽署
-              </p>
-              <p className="text-sm text-gray-500">
-                (Please proceed to Page 2 for the formal contract and signatures)
-              </p>
+            {/* 第一頁底部：換頁簽署提示 與 岳野品牌腳註 */}
+            <div>
+              <div className="border-t-4 border-gray-800 pt-4 mt-6 text-center">
+                <p className="text-xl font-black text-gray-800 tracking-widest mb-1">
+                  ➡ 正式合約條款將於第二頁簽署
+                </p>
+                <p className="text-sm text-gray-500 mb-4">
+                  (Please proceed to Page 2 for the formal contract and signatures)
+                </p>
+              </div>
+              
+              <div className="text-[10px] text-gray-400 text-center border-t border-gray-200 pt-2 font-medium tracking-wide">
+                岳野登山公司 | SORANOSHITA 裝備合作 | 專業富士山、日本健行行程規劃與裝備租賃服務
+              </div>
             </div>
           </div>
 
@@ -177,9 +183,15 @@ export default function AdminOrders() {
             
             {/* 上半部：合約條款 */}
             <div>
-              <div className="text-center mb-8 border-b-2 border-black pb-4">
-                <h2 className="text-2xl font-bold tracking-widest">戶外用品租賃合約書 (2/2)</h2>
-                <p className="text-xs text-gray-500 mt-1">SORANOSHITA Rental Agreement</p>
+              {/* 🌟 亮點修改：讓第二頁也有對齊的標題與訂單編號 🌟 */}
+              <div className="flex justify-between items-end border-b-4 border-black pb-2 mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tighter">戶外用品租賃合約書 (2/2)</h2>
+                  <p className="text-xs text-gray-500 uppercase font-mono">SORANOSHITA Rental Agreement</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold">訂單編號：{selectedOrder?.訂單編號}</p>
+                </div>
               </div>
 
               <div className="text-xs text-gray-800 leading-loose space-y-4">
@@ -209,13 +221,13 @@ export default function AdminOrders() {
               </div>
             </div>
 
-            {/* 第二頁底部：最終簽署區 */}
-            <div className="mb-10">
+            {/* 第二頁底部：最終簽署區 與 岳野品牌腳註 */}
+            <div className="mb-4">
               <p className="text-sm mb-8 font-bold text-gray-800">
                 為證明本合約的締結，雙方已確認第一頁之裝備與尺寸無誤，並同意上述所有條款。
               </p>
               
-              <div className="flex justify-between px-4">
+              <div className="flex justify-between px-4 mb-10">
                 <div className="border-t-2 border-black pt-2 w-64">
                   <p className="text-lg font-bold text-center">乙方 (承租人) 簽署</p>
                   <p className="text-xs text-gray-400 mt-1 text-center">Customer Signature</p>
@@ -227,6 +239,11 @@ export default function AdminOrders() {
                   <p className="text-xs text-gray-400 mt-1 text-center">Staff Signature</p>
                   <div className="mt-6 text-sm text-gray-500 text-center">簽署日期：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;日</div>
                 </div>
+              </div>
+
+              {/* 🌟 品牌腳註 (保留於頁底) */}
+              <div className="text-[10px] text-gray-400 text-center border-t border-gray-200 pt-2 font-medium tracking-wide">
+                岳野登山公司 | SORANOSHITA 裝備合作 | 專業富士山、日本健行行程規劃與裝備租賃服務
               </div>
             </div>
 
