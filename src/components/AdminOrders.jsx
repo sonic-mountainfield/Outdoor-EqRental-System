@@ -103,10 +103,10 @@ export default function AdminOrders() {
       {/* 📥 壓縮版 A4 租賃合約 (僅在列印時顯示) */}
       {/* ========================================================= */}
       <div style={{ display: 'none' }}>
-        <div ref={printRef} className="p-10 text-black font-sans leading-snug bg-white" style={{ width: '210mm' }}>
+        <div ref={printRef} className="p-8 text-black font-sans leading-tight bg-white" style={{ width: '210mm' }}>
           
           {/* 1. 頁首標題 */}
-          <div className="flex justify-between items-end border-b-4 border-black pb-2 mb-4">
+          <div className="flex justify-between items-end border-b-4 border-black pb-2 mb-3">
             <div>
               <h1 className="text-2xl font-bold tracking-tighter">戶外用品租賃合約書</h1>
               <p className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Outdoor Equipment Rental Agreement</p>
@@ -118,7 +118,7 @@ export default function AdminOrders() {
           </div>
           
           {/* 2. 客戶與行程資料區 */}
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1 mb-4 text-xs bg-gray-50 p-3 rounded border border-gray-200">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-1 mb-3 text-xs bg-gray-50 p-2 rounded border border-gray-200">
             <p><strong>承租人姓名：</strong> <span className="text-base font-bold underline px-1">{selectedOrder?.姓名}</span></p>
             <p className="text-right"><strong>預約日期：</strong> {selectedOrder?.建立時間?.split(' ')[0]}</p>
             <p><strong>聯絡電話：</strong> {selectedOrder?.電話}</p>
@@ -126,72 +126,116 @@ export default function AdminOrders() {
           </div>
 
           {/* 3. 裝備核對清單 (直式勾選區) */}
-          <div className="border-2 border-black p-4 rounded-md mb-4 bg-white shadow-sm">
-            <div className="flex justify-between items-center border-b border-gray-200 pb-1 mb-3">
+          <div className="border-2 border-black p-3 rounded-md mb-3 bg-white shadow-sm">
+            <div className="flex justify-between items-center border-b border-gray-200 pb-1 mb-2">
               <h3 className="font-bold text-sm bg-black text-white px-2 py-0.5">裝備核對清單 Checklist</h3>
               <p className="text-xs"><strong>方案內容：</strong> {selectedOrder?.選擇方案}</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-x-10 gap-y-1.5 mb-2">
+            <div className="grid grid-cols-2 gap-x-10 gap-y-1 mb-1">
               {selectedOrder?.裝備清單?.split(', ').map((item, index) => (
-                <div key={index} className="flex items-center border-b border-gray-100 py-1">
-                  {/* 核對小方框 */}
-                  <div className="w-4 h-4 border-2 border-black mr-3 flex-shrink-0 bg-white"></div> 
-                  <span className="text-sm font-medium text-gray-700">{item}</span>
+                <div key={index} className="flex items-center border-b border-gray-100 py-0.5">
+                  <div className="w-3.5 h-3.5 border-2 border-black mr-2 flex-shrink-0 bg-white"></div> 
+                  <span className="text-xs font-medium text-gray-700">{item}</span>
                 </div>
               ))}
             </div>
 
-            <div className="text-right text-lg font-black pt-2 border-t border-dotted border-gray-400 mt-2">
-              合計租金金額：<span className="text-2xl">NT$ {selectedOrder?.總金額}</span>
+            <div className="text-right text-base font-black pt-1 border-t border-dotted border-gray-400 mt-1">
+              合計租金金額：<span className="text-xl">NT$ {selectedOrder?.總金額}</span>
             </div>
           </div>
 
-          {/* 4. キャンセル規定 / 取消規定 (中日雙語) */}
-          <div className="bg-red-50 p-3 border border-red-200 rounded-md mb-4">
-            <h4 className="text-[11px] font-bold text-red-800 mb-1">【キャンセル規定 / 取消規定】</h4>
-            <ul className="text-[10px] text-red-700 space-y-1 list-disc pl-4 leading-tight">
+          {/* 4. 現場尺寸確認區 */}
+          <div className="border border-gray-400 p-2 rounded-md mb-3 bg-gray-50">
+            <h3 className="font-bold text-xs mb-1.5 border-b border-gray-300 pb-1 flex justify-between text-gray-800">
+              <span>📏 現場尺寸確認 (現場試穿後勾選)</span>
+            </h3>
+            
+            <div className="grid grid-cols-2 gap-4 text-[9px] leading-snug">
+              {/* 成人用區 */}
+              <div className="border-r border-gray-300 pr-2">
+                <p className="font-bold border-b border-gray-200 mb-1">【成人用套組】</p>
+                <div className="flex gap-3 mb-1">
+                  <span className="flex items-center gap-1"><div className="w-2.5 h-2.5 border border-black bg-white"></div> 男性用</span>
+                  <span className="flex items-center gap-1"><div className="w-2.5 h-2.5 border border-black bg-white"></div> 女性用</span>
+                </div>
+                <div className="mb-1">
+                  <p>服裝：(男) S/M/L/XL/XXL ｜ (女) S/M/L/XL</p>
+                  <p>確認尺寸：<span className="inline-block w-24 border-b border-black"></span></p>
+                </div>
+                <div>
+                  <p>鞋子：(男) 25.5-31.0 ｜ (女) 23.5-25.5</p>
+                  <p>確認尺寸：<span className="inline-block w-24 border-b border-black"></span></p>
+                  <p className="text-[8px] text-gray-500">(若需更大尺寸請選用男性用)</p>
+                </div>
+              </div>
+
+              {/* 兒童用區 */}
+              <div className="pl-2">
+                <p className="font-bold border-b border-gray-200 mb-1">【兒童用套組】</p>
+                <div className="flex gap-3 mb-1">
+                  <span className="flex items-center gap-1"><div className="w-2.5 h-2.5 border border-black bg-white"></div> 男孩款</span>
+                  <span className="flex items-center gap-1"><div className="w-2.5 h-2.5 border border-black bg-white"></div> 女孩款</span>
+                </div>
+                <div className="mb-1">
+                  <p>服裝：110 / 120 / 130 / 140 / 150</p>
+                  <p>確認尺寸：<span className="inline-block w-24 border-b border-black"></span></p>
+                </div>
+                <div>
+                  <p>鞋子：18.0 / 19.0 / 20.0 / 21.0 / 22.0 / 23.0 / 24.0 / 25.0</p>
+                  <p>確認尺寸：<span className="inline-block w-24 border-b border-black"></span></p>
+                  <p className="text-[8px] text-gray-500">(若需更大尺寸請選用成人套組)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 5. キャンセル規定 / 取消規定 (中日雙語) */}
+          <div className="bg-red-50 p-2 border border-red-200 rounded-md mb-3">
+            <h4 className="text-[10px] font-bold text-red-800 mb-0.5">【キャンセル規定 / 取消規定】</h4>
+            <ul className="text-[9px] text-red-700 space-y-0.5 list-disc pl-4 leading-tight">
               <li>
-                出発日の20日前までのキャンセル：レンタル料の10％を申し受けます。<br/>
-                <span className="text-[9px] opacity-75">(出發前 20 日以上取消：酌收租金 10% 為手續費)</span>
+                出発日の20日前までのキャンセル：レンタル料の10％を申し受けます。
+                <span className="opacity-75 ml-1">(出發前 20 日以上取消：酌收租金 10% 為手續費)</span>
               </li>
               <li>
-                出発日の7日前までのキャンセル：レンタル料の50％を申し受けます。<br/>
-                <span className="text-[9px] opacity-75">(出發前 7 日以上取消：酌收租金 50% 為手續費)</span>
+                出発日の7日前までのキャンセル：レンタル料の50％を申し受けます。
+                <span className="opacity-75 ml-1">(出發前 7 日以上取消：酌收租金 50% 為手續費)</span>
               </li>
               <li>
-                出発日の3日前以降（当日含む）のキャンセル：レンタル料は返金不可となります。<br/>
-                <span className="text-[9px] opacity-75">(出發前 3 日內及當日取消：租金恕不退還)</span>
+                出発日の3日前以降（当日含む）のキャンセル：レンタル料は返金不可となります。
+                <span className="opacity-75 ml-1">(出發前 3 日內及當日取消：租金恕不退還)</span>
               </li>
             </ul>
           </div>
 
-          {/* 5. 租賃合約條款 */}
-          <div className="p-3 border border-gray-300 rounded-md mb-6 bg-white">
-            <h4 className="text-[11px] font-bold mb-1 underline">租賃合約條款 (Rental Terms)</h4>
-            <ol className="text-[9px] text-gray-600 space-y-1 list-decimal pl-4 leading-normal">
+          {/* 6. 租賃合約條款 */}
+          <div className="p-2 border border-gray-300 rounded-md mb-5 bg-white">
+            <h4 className="text-[10px] font-bold mb-0.5 underline">租賃合約條款 (Rental Terms)</h4>
+            <ol className="text-[9px] text-gray-600 space-y-0.5 list-decimal pl-4 leading-normal">
               <li>承租人已於現場完成裝備測試，確認尺寸合適且功能正常，並由雙方核對數量無誤。</li>
               <li>裝備若發生非正常磨損之損壞、遺失或失竊，承租人同意依原價之 70% 進行賠償。</li>
-              <li>承租人提供之護照資料僅供報名行程、申請保險及入山證使用，岳野登山負保密責任。</li>
+              <li>承租人提供之個人資料僅供行程報名及保險使用，岳野登山負保密責任。</li>
               <li>裝備領取後，若因個人因素提前歸還，恕不退還剩餘天數之租金。</li>
             </ol>
           </div>
 
-          {/* 6. 簽署區塊 */}
-          <div className="mt-12 flex justify-between px-2">
-            <div className="border-t-2 border-black pt-1 w-64 text-center">
-              <p className="text-sm font-bold">承租者簽署 (尺寸與條款確認)</p>
-              <p className="text-[10px] text-gray-400 mt-1 italic italic">Customer Signature</p>
+          {/* 7. 簽署區塊 */}
+          <div className="mt-6 flex justify-between px-4">
+            <div className="border-t-2 border-black pt-1 w-56 text-center">
+              <p className="text-xs font-bold">承租者簽署 (尺寸與條款確認)</p>
+              <p className="text-[9px] text-gray-400 mt-0.5 italic">Customer Signature</p>
             </div>
-            <div className="border-t-2 border-black pt-1 w-64 text-center">
-              <p className="text-sm font-bold">岳野登山 經手人簽章</p>
-              <p className="text-[10px] text-gray-400 mt-1 italic italic">Staff Signature</p>
+            <div className="border-t-2 border-black pt-1 w-56 text-center">
+              <p className="text-xs font-bold">岳野登山 經手人簽章</p>
+              <p className="text-[9px] text-gray-400 mt-0.5 italic">Staff Signature</p>
             </div>
           </div>
           
-          {/* 7. 腳註 */}
-          <div className="mt-10 text-[8px] text-gray-400 text-center border-t border-gray-100 pt-2">
-            岳野登山公司 | 專業富士山、各國健行行程規劃與裝備租賃服務
+          {/* 8. 腳註 */}
+          <div className="mt-4 text-[8px] text-gray-400 text-center border-t border-gray-100 pt-1">
+            岳野登山公司 | SORANOSHITA 裝備合作 | 專業富士山、各國健行行程規劃與裝備租賃服務
           </div>
         </div>
       </div>
