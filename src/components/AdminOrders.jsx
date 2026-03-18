@@ -6,6 +6,7 @@ export default function AdminOrders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const printRef = useRef();
 
+  // 📝 這裡確保與你的 SheetDB API 網址一致
   const SHEETDB_URL = 'https://sheetdb.io/api/v1/0r2rfy0cdm7yk';
 
   useEffect(() => {
@@ -32,40 +33,45 @@ export default function AdminOrders() {
   return (
     <div className="min-h-screen bg-slate-100 p-4 sm:p-8 font-sans">
       <div className="max-w-5xl mx-auto">
+        {/* --- 頂部管理列 --- */}
         <div className="flex justify-between items-center mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
           <div>
             <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <span className="bg-emerald-600 text-white p-1 rounded">⛰️</span> 岳野登山後台管理
+              <span className="bg-[#109868] text-white p-1 rounded">⛰️</span> 岳野登山後台管理
             </h1>
-            <p className="text-xs text-gray-400 mt-1">租賃系統 v2.1 | 雙頁連動合約模式</p>
+            <p className="text-xs text-gray-400 mt-1">租賃系統 v3.0 | 雙頁代理合約模式</p>
           </div>
-          <button onClick={() => window.location.href='/'} className="text-sm font-medium text-emerald-700 bg-emerald-50 px-4 py-2 rounded-lg hover:bg-emerald-100 transition-all border border-emerald-100">
+          <button onClick={() => window.location.href='/'} className="text-sm font-medium text-[#109868] bg-[#f0fbf6] px-4 py-2 rounded-lg hover:bg-[#dcf3e8] transition-all border border-[#109868]">
             ← 返回客戶預約頁
           </button>
         </div>
 
+        {/* --- 訂單列表表格 --- */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="p-4 text-sm font-bold text-gray-600">訂單編號</th>
                 <th className="p-4 text-sm font-bold text-gray-600">承租人/行程</th>
-                <th className="p-4 text-sm font-bold text-gray-600">金額</th>
+                <th className="p-4 text-sm font-bold text-gray-600">方案/金額</th>
                 <th className="p-4 text-sm font-bold text-gray-600 text-right">操作</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-emerald-50 transition-colors">
+                <tr key={i} className="border-b border-gray-50 hover:bg-[#f0fbf6] transition-colors">
                   <td className="p-4 text-xs font-mono text-gray-400">{order.訂單編號}</td>
                   <td className="p-4">
                     <div className="font-bold text-gray-800">{order.姓名}</div>
                     <div className="text-xs text-gray-500 truncate max-w-xs">{order.團名與日期}</div>
                   </td>
-                  <td className="p-4 font-bold text-emerald-600">NT$ {order.總金額}</td>
+                  <td className="p-4">
+                    <div className="text-sm text-gray-700">{order.選擇方案}</div>
+                    <div className="font-bold text-[#109868] mt-0.5">NT$ {order.總金額?.toLocaleString()}</div>
+                  </td>
                   <td className="p-4 text-right">
-                    <button onClick={() => triggerPrint(order)} className="bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-emerald-700 active:scale-95 transition-all">
-                      🖨️ 列印兩頁合約
+                    <button onClick={() => triggerPrint(order)} className="bg-[#109868] text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-[#0c7a52] active:scale-95 transition-all">
+                      🖨️ 列印雙頁合約
                     </button>
                   </td>
                 </tr>
@@ -105,11 +111,14 @@ export default function AdminOrders() {
                 <p className="text-right"><strong>參加行程：</strong> {selectedOrder?.團名與日期}</p>
               </div>
 
-              {/* 裝備核對清單 (直式勾選區) */}
+              {/* 裝備核對清單 (動態產生勾選框) */}
               <div className="border-2 border-black p-4 rounded-md mb-6 bg-white shadow-sm">
                 <div className="flex justify-between items-center border-b border-gray-200 pb-2 mb-3">
                   <h3 className="font-bold text-sm bg-black text-white px-2 py-1">裝備核對清單 Checklist</h3>
-                  <p className="text-sm font-bold text-emerald-700">合計金額：NT$ {selectedOrder?.總金額}</p>
+                  <div className="text-right">
+                     <span className="text-xs text-gray-500 mr-2">{selectedOrder?.選擇方案}</span>
+                     <span className="text-sm font-bold text-[#109868]">合計金額：NT$ {selectedOrder?.總金額?.toLocaleString()}</span>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-x-10 gap-y-2 mb-2">
                   {selectedOrder?.裝備清單?.split(', ').map((item, index) => (
@@ -121,33 +130,33 @@ export default function AdminOrders() {
                 </div>
               </div>
 
-              {/* 現場尺寸確認區 (整合成人與兒童) */}
-              <div className="border-2 border-gray-400 p-4 rounded-md mb-6 bg-gray-50">
-                <h3 className="font-bold text-sm mb-3 border-b border-gray-300 pb-2">📏 現場尺寸確認 (現場試穿後由工作人員勾選)</h3>
+              {/* 現場尺寸確認區 (含公分) */}
+              <div className="border border-gray-400 p-3 rounded-md mb-6 bg-gray-50">
+                <h3 className="font-bold text-sm mb-2 border-b border-gray-300 pb-2">📏 現場尺寸確認 (現場試穿後由工作人員勾選)</h3>
                 <div className="grid grid-cols-2 gap-6 text-xs leading-relaxed">
                   {/* 成人用 */}
-                  <div className="border-r border-gray-300 pr-4">
+                  <div className="border-r border-gray-300 pr-2">
                     <p className="font-bold border-b border-gray-200 mb-2">【成人用套組】</p>
-                    <div className="flex gap-4 mb-2">
+                    <div className="flex gap-3 mb-2">
                       <span className="flex items-center gap-1"><div className="w-3 h-3 border border-black bg-white"></div> 男性用</span>
                       <span className="flex items-center gap-1"><div className="w-3 h-3 border border-black bg-white"></div> 女性用</span>
                     </div>
                     <p className="mb-1">服裝：(男) S/M/L/XL/XXL ｜ (女) S/M/L/XL</p>
-                    <p className="mb-3">確認尺寸：<span className="inline-block w-32 border-b border-black"></span></p>
-                    <p className="mb-1">鞋子：(男) 25.5-31.0 ｜ (女) 23.5-25.5  (公分)</p>
-                    <p>確認尺寸：<span className="inline-block w-32 border-b border-black"></span></p>
+                    <p className="mb-3">確認尺寸：<span className="inline-block w-24 border-b border-black"></span></p>
+                    <p className="mb-1">鞋子：(男) 25.5-31.0 ｜ (女) 23.5-25.5</p>
+                    <p>確認尺寸：<span className="inline-block w-24 border-b border-black"></span> <span className="text-gray-600">公分</span></p>
                   </div>
                   {/* 兒童用 */}
                   <div className="pl-2">
                     <p className="font-bold border-b border-gray-200 mb-2">【兒童用套組】</p>
-                    <div className="flex gap-4 mb-2">
+                    <div className="flex gap-3 mb-2">
                       <span className="flex items-center gap-1"><div className="w-3 h-3 border border-black bg-white"></div> 男孩款</span>
                       <span className="flex items-center gap-1"><div className="w-3 h-3 border border-black bg-white"></div> 女孩款</span>
                     </div>
-                    <p className="mb-1">服裝：110 / 120 / 130 / 140 / 150</p>
-                    <p className="mb-3">確認尺寸：<span className="inline-block w-32 border-b border-black"></span></p>
-                    <p className="mb-1">鞋子：18.0 - 25.0 (公分)</p>
-                    <p>確認尺寸：<span className="inline-block w-32 border-b border-black"></span></p>
+                    <p className="mb-1">服裝：110 / 120 / 130 / 140 / 150 <span className="text-gray-500">公分</span></p>
+                    <p className="mb-3">確認尺寸：<span className="inline-block w-24 border-b border-black"></span></p>
+                    <p className="mb-1">鞋子：18.0 - 25.0</p>
+                    <p>確認尺寸：<span className="inline-block w-24 border-b border-black"></span> <span className="text-gray-600">公分</span></p>
                   </div>
                 </div>
               </div>
@@ -183,11 +192,10 @@ export default function AdminOrders() {
             
             {/* 上半部：合約條款 */}
             <div>
-              {/* 🌟 亮點修改：讓第二頁也有對齊的標題與訂單編號 🌟 */}
               <div className="flex justify-between items-end border-b-4 border-black pb-2 mb-6">
                 <div>
                   <h2 className="text-2xl font-bold tracking-tighter">戶外用品租賃合約書 (2/2)</h2>
-                  <p className="text-xs text-gray-500 uppercase font-mono">SORANOSHITA Rental Agreement</p>
+                  <p className="text-xs text-gray-500 uppercase font-mono">Rental Agreement</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-bold">訂單編號：{selectedOrder?.訂單編號}</p>
@@ -195,7 +203,10 @@ export default function AdminOrders() {
               </div>
 
               <div className="text-xs text-gray-800 leading-loose space-y-4">
-                <p>SORANOSHITA股份有限公司（以下簡稱「甲方」）與 <strong>{selectedOrder?.姓名}</strong>（以下簡稱「乙方」）就戶外用品租賃事宜，締結以下合約。</p>
+                {/* 🌟 代理授權宣告 */}
+                <p>
+                  SORANOSHITA股份有限公司（授權在台代理：<strong>岳野登山公司</strong>，以下簡稱「甲方」）與 <strong>{selectedOrder?.姓名}</strong>（以下簡稱「乙方」）就戶外用品租賃事宜，締結以下合約。
+                </p>
                 
                 <div className="grid grid-cols-1 gap-2 pl-2">
                   <p><strong>第1條 (合約目的)</strong>：甲方向乙方出租乙方所選定的戶外用品，乙方承租該物品，並在規定期間使用後歸還。</p>
@@ -214,10 +225,14 @@ export default function AdminOrders() {
                 </div>
               </div>
 
+              {/* 🌟 甲方與代理商資訊 */}
               <div className="mt-8 p-4 border border-gray-300 rounded bg-gray-50 text-[10px] text-gray-600">
-                <p className="font-bold mb-1">【甲方（出租人）】</p>
-                <p>公司名稱：SORANOSHITA股份有限公司 ｜ 代表人：代表董事</p>
-                <p>地址：〒403-0017 日本山梨縣富士吉田市新西原5-2-1</p>
+                <p className="font-bold mb-1">【甲方（出租人）與 授權代理資訊】</p>
+                <p>總公司：SORANOSHITA股份有限公司 ｜ 代表人：代表董事</p>
+                <p>總部地址：〒403-0017 日本山梨縣富士吉田市新西原5-2-1</p>
+                <p className="mt-1 pt-1 border-t border-gray-200 text-gray-800 font-medium">
+                  在台授權代理處：岳野登山公司
+                </p>
               </div>
             </div>
 
@@ -228,20 +243,21 @@ export default function AdminOrders() {
               </p>
               
               <div className="flex justify-between px-4 mb-10">
+                {/* 乙方簽名 */}
                 <div className="border-t-2 border-black pt-2 w-64">
                   <p className="text-lg font-bold text-center">乙方 (承租人) 簽署</p>
                   <p className="text-xs text-gray-400 mt-1 text-center">Customer Signature</p>
                   <div className="mt-6 text-sm text-gray-500 text-center">簽署日期：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;日</div>
                 </div>
                 
+                {/* 🌟 甲方代理簽名 */}
                 <div className="border-t-2 border-black pt-2 w-64">
-                  <p className="text-lg font-bold text-center">甲方 (經手人) 簽章</p>
-                  <p className="text-xs text-gray-400 mt-1 text-center">Staff Signature</p>
+                  <p className="text-lg font-bold text-center">甲方授權代理 (岳野登山) 簽章</p>
+                  <p className="text-xs text-gray-400 mt-1 text-center">Authorized Agent Signature</p>
                   <div className="mt-6 text-sm text-gray-500 text-center">簽署日期：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;日</div>
                 </div>
               </div>
 
-              {/* 🌟 品牌腳註 (保留於頁底) */}
               <div className="text-[10px] text-gray-400 text-center border-t border-gray-200 pt-2 font-medium tracking-wide">
                 岳野登山公司 | SORANOSHITA 裝備合作 | 專業富士山、日本健行行程規劃與裝備租賃服務
               </div>
