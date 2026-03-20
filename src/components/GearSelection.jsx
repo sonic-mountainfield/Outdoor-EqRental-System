@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-// 1. 引入本地圖片
+// 1. 引入本地圖片 (請確認路徑與你專案一致)
 import imgBackpackCover from '../assets/images/gear/backpack_cover.png';
 import imgRaincoat from '../assets/images/gear/raincoat.png';
 import imgRainPants from '../assets/images/gear/rain_pants.png';
@@ -24,8 +24,13 @@ const GEAR_ITEMS = [
   { id: 9, name: '登山鞋', image: imgHikingBoots },
 ];
 
-// 定義固定不可取消的裝備 ID (7: 綁腿, 8: 頭燈)
-const FIXED_GEAR_IDS = [7, 8];
+// 💡 定義連動綁定的裝備群組 (輸入任一個ID，就會回傳該綁定群組的所有ID)
+const PAIRED_GROUPS = {
+  1: [1, 5], // 點背包套 -> 連動大背包
+  5: [1, 5], // 點大背包 -> 連動背包套
+  2: [2, 3], // 點雨衣 -> 連動雨褲
+  3: [2, 3]  // 點雨褲 -> 連動雨衣
+};
 
 export default function GearSelection({ onNextStep }) {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -36,36 +41,32 @@ export default function GearSelection({ onNextStep }) {
   const handlePlanSelect = (plan) => {
     setSelectedPlan(plan);
     setWarningMsg('');
-    
-    if (plan === 'adult7') {
-      // 💡 選擇自由選方案時，預設直接帶入固定的裝備 ID
-      setSelectedGears([...FIXED_GEAR_IDS]);
-    } else {
-      setSelectedGears([]);
-    }
+    // 💡 取消固定必選，切換方案時一律清空已選裝備
+    setSelectedGears([]);
   };
 
   // 處理裝備點擊 (僅在 adult7 方案下有效)
   const toggleGear = (gearId) => {
     if (selectedPlan !== 'adult7') return;
 
-    // 💡 防呆：如果是固定裝備，不允許取消
-    if (FIXED_GEAR_IDS.includes(gearId)) {
-      setWarningMsg('⚠️ 綁腿與頭燈為此方案的固定基本裝備，不可取消');
-      return;
-    }
+    // 取得該裝備對應的連動群組 (如果沒有連動，就只有自己一個人的陣列)
+    const groupToToggle = PAIRED_GROUPS[gearId] || [gearId];
+    // 判斷該裝備是否已經被選取
+    const isCurrentlySelected = selectedGears.includes(gearId);
 
-    if (selectedGears.includes(gearId)) {
-      // 取消選取
-      setSelectedGears(selectedGears.filter(id => id !== gearId));
+    if (isCurrentlySelected) {
+      // 💡 取消選取：將綁定群組內的裝備一併移除
+      setSelectedGears(selectedGears.filter(id => !groupToToggle.includes(id)));
       setWarningMsg('');
     } else {
-      // 新增選取
-      if (selectedGears.length >= 7) {
-        setWarningMsg('⚠️ 只能選擇 7 件，請先取消其他裝備');
+      // 💡 新增選取：先檢查剩餘名額夠不夠放進這個群組
+      if (selectedGears.length + groupToToggle.length > 7) {
+        setWarningMsg(`⚠️ 只能選擇 7 件。此組合需佔用 ${groupToToggle.length} 件名額，請先取消其他裝備。`);
         return;
       }
-      setSelectedGears([...selectedGears, gearId]);
+      // 將綁定群組內的裝備一併加入
+      setSelectedGears([...selectedGears, ...groupToToggle]);
+      setWarningMsg('');
     }
   };
 
@@ -79,7 +80,8 @@ export default function GearSelection({ onNextStep }) {
     const orderData = {
       plan: selectedPlan,
       gears: selectedPlan === 'adult7' ? selectedGears : GEAR_ITEMS.map(g => g.id),
-      price: selectedPlan === 'adult9' ? 4000 : selectedPlan === 'child9' ? 3500 : 3000
+      // 💡 價格設定：adult9為4000，其餘(adult7, child9)皆為3500
+      price: selectedPlan === 'adult9' ? 4000 : 3500
     };
     if(onNextStep) onNextStep(orderData);
   };
@@ -121,7 +123,7 @@ export default function GearSelection({ onNextStep }) {
         >
           <div className="flex justify-between items-center">
             <span className="font-bold text-lg">成人自由選七件組</span>
-            <span className="text-emerald-600 font-semibold">NT$ 3,000</span>
+            <span className="text-emerald-600 font-semibold">NT$ 3,500</span>
           </div>
         </div>
       </div>
@@ -132,7 +134,10 @@ export default function GearSelection({ onNextStep }) {
           <div className="flex justify-between items-center mb-4 sticky top-0 bg-white/90 py-2 z-10 backdrop-blur-sm">
             <div>
               <h2 className="text-lg font-semibold text-gray-700">2. 挑選 7 件裝備</h2>
-              <p className="text-sm text-gray-500">包含 2 件固定基本裝備 (頭燈、綁腿)</p>
+              {/* 💡 提示文字更新 */}
+              <p className="text-sm text-emerald-600 font-medium mt-1">
+                ※ 大背包與背包套、雨衣與雨褲需合併選取
+              </p>
             </div>
             <span className={`font-bold px-3 py-1 rounded-full ${selectedGears.length === 7 ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
               已選 {selectedGears.length} / 7
@@ -144,35 +149,36 @@ export default function GearSelection({ onNextStep }) {
           <div className="grid grid-cols-3 gap-3">
             {GEAR_ITEMS.map((item) => {
               const isSelected = selectedGears.includes(item.id);
-              const isFixed = FIXED_GEAR_IDS.includes(item.id); // 判斷是否為固定裝備
 
               return (
                 <div 
                   key={item.id}
                   onClick={() => toggleGear(item.id)}
-                  // 💡 UI 調整：固定裝備給予不同的樣式與鎖定的游標
-                  className={`relative flex flex-col items-center p-2 rounded-xl border-2 transition-all overflow-hidden
-                    ${isFixed 
-                      ? 'border-emerald-600 bg-emerald-100 cursor-not-allowed opacity-90 shadow-sm' 
-                      : isSelected 
-                        ? 'border-emerald-500 bg-emerald-50 shadow-md cursor-pointer' 
-                        : 'border-gray-200 hover:border-emerald-300 hover:shadow-sm cursor-pointer'}`}
+                  className={`relative flex flex-col items-center p-2 rounded-xl border-2 cursor-pointer transition-all overflow-hidden
+                    ${isSelected ? 'border-emerald-500 bg-emerald-50 shadow-md' : 'border-gray-200 hover:border-emerald-300 hover:shadow-sm'}`}
                 >
                   <img src={item.image} alt={item.name} className="w-full h-24 object-cover rounded-md mb-2" />
                   <span className={`text-sm font-medium ${isSelected ? 'text-emerald-800' : 'text-gray-700'}`}>
                     {item.name}
                   </span>
                   
-                  {/* 💡 標籤切換：固定裝備顯示「必備」，其他選取的顯示「✓」 */}
-                  {isFixed ? (
-                    <div className="absolute top-2 right-2 bg-emerald-600 text-white rounded px-1.5 py-0.5 text-[10px] font-bold shadow-sm">
-                      必備
-                    </div>
-                  ) : isSelected ? (
+                  {isSelected && (
                     <div className="absolute top-2 right-2 bg-emerald-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-sm">
                       ✓
                     </div>
-                  ) : null}
+                  )}
+
+                  {/* 💡 如果是綁定裝備，加上小小的連結圖示或標籤提醒 (視覺優化) */}
+                  {(item.id === 1 || item.id === 5) && !isSelected && (
+                    <div className="absolute top-2 left-2 text-[10px] text-gray-400 bg-gray-100 px-1 rounded">
+                      包套連動
+                    </div>
+                  )}
+                  {(item.id === 2 || item.id === 3) && !isSelected && (
+                    <div className="absolute top-2 left-2 text-[10px] text-gray-400 bg-gray-100 px-1 rounded">
+                      雨具連動
+                    </div>
+                  )}
                 </div>
               );
             })}
