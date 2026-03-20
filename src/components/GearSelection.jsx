@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-// 1. 引入本地圖片 (⚠️ 請確認這裡的檔名與你上傳的完全一致！)
+// 1. 引入本地圖片
 import imgBackpackCover from '../assets/images/gear/backpack_cover.png';
 import imgRaincoat from '../assets/images/gear/raincoat.png';
 import imgRainPants from '../assets/images/gear/rain_pants.png';
@@ -11,7 +11,7 @@ import imgGaiters from '../assets/images/gear/gaiters.png';
 import imgHeadlamp from '../assets/images/gear/headlamp.png';
 import imgHikingBoots from '../assets/images/gear/hiking_boots.png';
 
-// 2. 更新裝備資料清單 (使用上方引入的圖片變數)
+// 2. 更新裝備資料清單
 const GEAR_ITEMS = [
   { id: 1, name: '背包套', image: imgBackpackCover },
   { id: 2, name: '雨衣', image: imgRaincoat },
@@ -24,20 +24,23 @@ const GEAR_ITEMS = [
   { id: 9, name: '登山鞋', image: imgHikingBoots },
 ];
 
+// 定義固定不可取消的裝備 ID (7: 綁腿, 8: 頭燈)
+const FIXED_GEAR_IDS = [7, 8];
+
 export default function GearSelection({ onNextStep }) {
-  // 狀態：目前選擇的方案 (adult9, child9, adult7)
   const [selectedPlan, setSelectedPlan] = useState(null);
-  // 狀態：自由選的裝備 ID 清單
   const [selectedGears, setSelectedGears] = useState([]);
-  // 狀態：警告訊息
   const [warningMsg, setWarningMsg] = useState('');
 
   // 處理方案點擊
   const handlePlanSelect = (plan) => {
     setSelectedPlan(plan);
     setWarningMsg('');
-    // 如果切換方案，清空已選裝備
-    if (plan !== 'adult7') {
+    
+    if (plan === 'adult7') {
+      // 💡 選擇自由選方案時，預設直接帶入固定的裝備 ID
+      setSelectedGears([...FIXED_GEAR_IDS]);
+    } else {
       setSelectedGears([]);
     }
   };
@@ -45,6 +48,12 @@ export default function GearSelection({ onNextStep }) {
   // 處理裝備點擊 (僅在 adult7 方案下有效)
   const toggleGear = (gearId) => {
     if (selectedPlan !== 'adult7') return;
+
+    // 💡 防呆：如果是固定裝備，不允許取消
+    if (FIXED_GEAR_IDS.includes(gearId)) {
+      setWarningMsg('⚠️ 綁腿與頭燈為此方案的固定基本裝備，不可取消');
+      return;
+    }
 
     if (selectedGears.includes(gearId)) {
       // 取消選取
@@ -60,13 +69,11 @@ export default function GearSelection({ onNextStep }) {
     }
   };
 
-  // 判斷是否可以進入下一步
   const canGoNext = 
     selectedPlan === 'adult9' || 
     selectedPlan === 'child9' || 
     (selectedPlan === 'adult7' && selectedGears.length === 7);
 
-  // 當按下下一步時，將資料整理好傳給上一層 (或跳轉頁面)
   const handleNext = () => {
     if (!canGoNext) return;
     const orderData = {
@@ -74,7 +81,6 @@ export default function GearSelection({ onNextStep }) {
       gears: selectedPlan === 'adult7' ? selectedGears : GEAR_ITEMS.map(g => g.id),
       price: selectedPlan === 'adult9' ? 4000 : selectedPlan === 'child9' ? 3500 : 3000
     };
-    // 呼叫父元件傳進來的 function，進入第二頁
     if(onNextStep) onNextStep(orderData);
   };
 
@@ -120,11 +126,14 @@ export default function GearSelection({ onNextStep }) {
         </div>
       </div>
 
-      {/* --- 自由選裝備區 (僅在選取 adult7 時顯示) --- */}
+      {/* --- 自由選裝備區 --- */}
       {selectedPlan === 'adult7' && (
         <div className="mb-8 animate-fade-in-down">
           <div className="flex justify-between items-center mb-4 sticky top-0 bg-white/90 py-2 z-10 backdrop-blur-sm">
-            <h2 className="text-lg font-semibold text-gray-700">2. 挑選 7 件裝備</h2>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-700">2. 挑選 7 件裝備</h2>
+              <p className="text-sm text-gray-500">包含 2 件固定基本裝備 (頭燈、綁腿)</p>
+            </div>
             <span className={`font-bold px-3 py-1 rounded-full ${selectedGears.length === 7 ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
               已選 {selectedGears.length} / 7
             </span>
@@ -135,22 +144,35 @@ export default function GearSelection({ onNextStep }) {
           <div className="grid grid-cols-3 gap-3">
             {GEAR_ITEMS.map((item) => {
               const isSelected = selectedGears.includes(item.id);
+              const isFixed = FIXED_GEAR_IDS.includes(item.id); // 判斷是否為固定裝備
+
               return (
                 <div 
                   key={item.id}
                   onClick={() => toggleGear(item.id)}
-                  className={`relative flex flex-col items-center p-2 rounded-xl border-2 cursor-pointer transition-all overflow-hidden
-                    ${isSelected ? 'border-emerald-500 bg-emerald-50 shadow-md' : 'border-gray-200 hover:border-emerald-300 hover:shadow-sm'}`}
+                  // 💡 UI 調整：固定裝備給予不同的樣式與鎖定的游標
+                  className={`relative flex flex-col items-center p-2 rounded-xl border-2 transition-all overflow-hidden
+                    ${isFixed 
+                      ? 'border-emerald-600 bg-emerald-100 cursor-not-allowed opacity-90 shadow-sm' 
+                      : isSelected 
+                        ? 'border-emerald-500 bg-emerald-50 shadow-md cursor-pointer' 
+                        : 'border-gray-200 hover:border-emerald-300 hover:shadow-sm cursor-pointer'}`}
                 >
-                  {/* 顯示引入的圖片 */}
                   <img src={item.image} alt={item.name} className="w-full h-24 object-cover rounded-md mb-2" />
-                  <span className={`text-sm font-medium ${isSelected ? 'text-emerald-700' : 'text-gray-700'}`}>{item.name}</span>
+                  <span className={`text-sm font-medium ${isSelected ? 'text-emerald-800' : 'text-gray-700'}`}>
+                    {item.name}
+                  </span>
                   
-                  {isSelected && (
+                  {/* 💡 標籤切換：固定裝備顯示「必備」，其他選取的顯示「✓」 */}
+                  {isFixed ? (
+                    <div className="absolute top-2 right-2 bg-emerald-600 text-white rounded px-1.5 py-0.5 text-[10px] font-bold shadow-sm">
+                      必備
+                    </div>
+                  ) : isSelected ? (
                     <div className="absolute top-2 right-2 bg-emerald-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-sm">
                       ✓
                     </div>
-                  )}
+                  ) : null}
                 </div>
               );
             })}
