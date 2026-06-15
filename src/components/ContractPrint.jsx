@@ -14,11 +14,12 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
 
   // 單聯的樣板設計
   const ContractSection = ({ type }) => (
-    <div className="p-8 border-2 border-gray-800 mb-4 min-h-[480px] flex flex-col justify-between">
+    // 修改：縮小 padding (p-8 -> p-6) 與 最小高度 (min-h-[480px] -> min-h-[420px])
+    <div className="p-6 border-2 border-gray-800 flex flex-col justify-between min-h-[420px]">
       <div>
-        <div className="flex justify-between items-end border-b-2 border-gray-800 pb-4 mb-4">
+        {/* 修改：縮小底部的 margin 和 padding (pb-4 -> pb-3, mb-4 -> mb-3) */}
+        <div className="flex justify-between items-end border-b-2 border-gray-800 pb-3 mb-3">
           <div>
-            {/* --- 新增：公司名稱抬頭 --- */}
             <h2 className="text-lg font-bold text-gray-600 mb-1 tracking-wide">
               TAKENO 台灣岳野登山有限公司
             </h2>
@@ -31,7 +32,8 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-6 bg-gray-50 p-4 rounded">
+        {/* 修改：縮小 margin 和 padding (mb-6 -> mb-4, p-4 -> p-3) */}
+        <div className="grid grid-cols-3 gap-4 mb-4 bg-gray-50 p-3 rounded">
           <p><span className="font-bold text-gray-700">客戶姓名：</span> {data.customerName}</p>
           <p><span className="font-bold text-gray-700">活動日期：</span> {data.activityDate}</p>
           <p><span className="font-bold text-gray-700">租借套餐：</span> {data.packageType}</p>
@@ -57,7 +59,8 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
               <p>登山鞋：{data.sizes.boots || '無'}</p>
             </div>
             {type === 'return' && (
-              <div className="mt-4 border-2 border-red-400 p-2 min-h-[80px]">
+              // 修改：縮小備註區的最小高度 (min-h-[80px] -> min-h-[60px])
+              <div className="mt-3 border-2 border-red-400 p-2 min-h-[60px]">
                 <p className="font-bold text-red-600 text-sm">歸還檢查備註區 (損壞/污損)：</p>
               </div>
             )}
@@ -65,7 +68,8 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
         </div>
       </div>
 
-      <div className="flex justify-around mt-8">
+      {/* 修改：縮小簽名區的上方 margin (mt-8 -> mt-4) */}
+      <div className="flex justify-around mt-4">
         <div className="border-t border-gray-800 w-40 text-center pt-2 text-sm font-bold">租借人簽名</div>
         <div className="border-t border-gray-800 w-40 text-center pt-2 text-sm font-bold">核對人簽名</div>
       </div>
@@ -73,11 +77,15 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
   );
 
   return (
-    <div ref={ref} className="bg-white p-8 font-sans">
+    // 修改：縮小外圍畫面的 padding (p-8 -> p-4) 以節省紙張空間
+    <div ref={ref} className="bg-white p-4 font-sans">
       <ContractSection type="pickup" />
-      <div className="text-center py-2 text-gray-400 border-y-2 border-dashed border-gray-300 my-6">
+      
+      {/* 修改：大幅縮小中間的 margin 和 padding (my-6 -> my-2, py-2 -> py-1) */}
+      <div className="text-center py-1 text-gray-400 border-y-2 border-dashed border-gray-300 my-2">
         ✂ 裁切線 (請沿線對折或剪開)
       </div>
+      
       <ContractSection type="return" />
     </div>
   );
