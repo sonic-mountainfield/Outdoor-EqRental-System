@@ -14,11 +14,11 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
 
   // 單聯的樣板設計
   const ContractSection = ({ type }) => (
-    <div className="p-8 border-2 border-gray-800 mb-4 min-h-[480px] flex flex-col justify-between">
+    // 移除了 mb-4 並微調 min-h-[450px]，讓整體版面更緊湊
+    <div className="p-8 border-2 border-gray-800 min-h-[450px] flex flex-col justify-between">
       <div>
         <div className="flex justify-between items-end border-b-2 border-gray-800 pb-4 mb-4">
           <div>
-            {/* 公司名稱抬頭 */}
             <h2 className="text-lg font-bold text-gray-600 mb-1 tracking-wide">
               TAKENO 台灣岳野登山有限公司
             </h2>
@@ -31,7 +31,7 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
           </span>
         </div>
 
-        {/* --- 修改：調整資訊欄排版，讓活動日期獨立一行 --- */}
+        {/* 姓名與套餐同一行，活動日期獨立成一行 */}
         <div className="flex flex-col gap-3 mb-6 bg-gray-50 p-4 rounded">
           <div className="grid grid-cols-2 gap-4">
             <p><span className="font-bold text-gray-700">客戶姓名：</span> {data.customerName}</p>
@@ -59,7 +59,7 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
               <p>羽絨衣：{data.sizes.downJacket || '無'}</p>
               <p>登山鞋：{data.sizes.boots || '無'}</p>
             </div>
-            {/* --- 修改：將下聯備註區文字改為裝備遺失 --- */}
+            {/* 下聯專屬：裝備遺失備註區 */}
             {type === 'return' && (
               <div className="mt-4 border-2 border-red-400 p-2 min-h-[80px]">
                 <p className="font-bold text-red-600 text-sm">裝備遺失：</p>
@@ -77,9 +77,11 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
   );
 
   return (
-    <div ref={ref} className="bg-white p-8 font-sans">
+    // p-6 稍微縮減外圍 padding，爭取更多列印空間
+    <div ref={ref} className="bg-white p-6 font-sans">
       <ContractSection type="pickup" />
-      <div className="h-6"></div>
+      {/* 縮小中間的空白處 */}
+      <div className="h-4"></div>
       <ContractSection type="return" />
     </div>
   );
