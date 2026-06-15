@@ -43,6 +43,26 @@ const FittingForm = () => {
     }));
   };
 
+  // --- 新增：處理全選與全不選邏輯 ---
+  const handleSelectAll = () => {
+    // 檢查是否目前所有的裝備都已經被勾選了
+    const isAllSelected = Object.values(formData.items).every(val => val === true);
+    
+    // 建立一個新的 items 物件，將所有裝備設為目前狀態的反向 (全勾 -> 全不勾，反之亦然)
+    const newItemsState = {};
+    for (let key in formData.items) {
+      newItemsState[key] = !isAllSelected;
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      items: newItemsState
+    }));
+  };
+
+  // 用來判斷目前是否為「全選」狀態，以控制全選勾選框的打勾圖示
+  const isAllSelected = Object.values(formData.items).every(val => val === true);
+
   const handleSizeChange = (name, value) => {
     setFormData(prev => ({
       ...prev,
@@ -106,7 +126,21 @@ const FittingForm = () => {
         </div>
 
         <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-          <label className="block text-lg font-bold text-gray-800 mb-4">裝備明細勾選</label>
+          {/* --- 新增：全選按鈕區塊 --- */}
+          <div className="flex justify-between items-center mb-4">
+            <label className="block text-lg font-bold text-gray-800">裝備明細勾選</label>
+            <label className="flex items-center space-x-2 cursor-pointer text-emerald-700 font-bold hover:text-emerald-800 transition">
+              <input 
+                type="checkbox" 
+                checked={isAllSelected} 
+                onChange={handleSelectAll} 
+                className="w-5 h-5 text-emerald-600 focus:ring-emerald-500 border-gray-400 rounded" 
+              />
+              <span>全選 / 全不選</span>
+            </label>
+          </div>
+          {/* ------------------------ */}
+          
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {Object.keys(formData.items).map(item => (
               <label key={item} className="flex items-center space-x-3 p-3 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-emerald-50 transition">
