@@ -18,7 +18,7 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
       <div>
         <div className="flex justify-between items-end border-b-2 border-gray-800 pb-4 mb-4">
           <div>
-            {/* --- 新增：公司名稱抬頭 --- */}
+            {/* 公司名稱抬頭 */}
             <h2 className="text-lg font-bold text-gray-600 mb-1 tracking-wide">
               TAKENO 台灣岳野登山有限公司
             </h2>
@@ -31,10 +31,13 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-6 bg-gray-50 p-4 rounded">
-          <p><span className="font-bold text-gray-700">客戶姓名：</span> {data.customerName}</p>
+        {/* --- 修改：調整資訊欄排版，讓活動日期獨立一行 --- */}
+        <div className="flex flex-col gap-3 mb-6 bg-gray-50 p-4 rounded">
+          <div className="grid grid-cols-2 gap-4">
+            <p><span className="font-bold text-gray-700">客戶姓名：</span> {data.customerName}</p>
+            <p><span className="font-bold text-gray-700">租借套餐：</span> {data.packageType}</p>
+          </div>
           <p><span className="font-bold text-gray-700">活動日期：</span> {data.activityDate}</p>
-          <p><span className="font-bold text-gray-700">租借套餐：</span> {data.packageType}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-8">
@@ -56,9 +59,10 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
               <p>羽絨衣：{data.sizes.downJacket || '無'}</p>
               <p>登山鞋：{data.sizes.boots || '無'}</p>
             </div>
+            {/* --- 修改：將下聯備註區文字改為裝備遺失 --- */}
             {type === 'return' && (
               <div className="mt-4 border-2 border-red-400 p-2 min-h-[80px]">
-                <p className="font-bold text-red-600 text-sm">歸還檢查備註區 (損壞/污損)：</p>
+                <p className="font-bold text-red-600 text-sm">裝備遺失：</p>
               </div>
             )}
           </div>
@@ -75,9 +79,7 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
   return (
     <div ref={ref} className="bg-white p-8 font-sans">
       <ContractSection type="pickup" />
-      <div className="text-center py-2 text-gray-400 border-y-2 border-dashed border-gray-300 my-6">
-        ✂ 裁切線 (請沿線對折或剪開)
-      </div>
+      <div className="h-6"></div>
       <ContractSection type="return" />
     </div>
   );
