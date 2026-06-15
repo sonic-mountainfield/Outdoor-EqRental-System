@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import GearSelection from './components/GearSelection';
 import CheckoutForm from './components/CheckoutForm';
-import AdminOrders from './components/AdminOrders'; // 引入你的管理員元件
+import AdminOrders from './components/AdminOrders';
+import FittingForm from './components/FittingForm'; // 新增：引入試穿與合約表單
 
 export default function App() {
   const [currentStep, setCurrentStep] = useState(1);
   const [orderData, setOrderData] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  
+  // 我們將 isAdmin 改為 appMode，這樣可以管理更多種後台模式
+  // 預設為 'customer' (顧客端)，其他還有 'admin' (訂單後台), 'fitting' (現場試穿)
+  const [appMode, setAppMode] = useState('customer'); 
 
   // 初始化時檢查網址參數
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('mode') === 'admin') {
-      setIsAdmin(true);
+    const mode = params.get('mode');
+    
+    if (mode === 'admin') {
+      setAppMode('admin');
+    } else if (mode === 'fitting') {
+      setAppMode('fitting');
     }
   }, []);
 
@@ -25,11 +33,19 @@ export default function App() {
     setCurrentStep(1);
   };
 
-  // 如果是管理員模式，直接顯示後台
-  if (isAdmin) {
+  // --- 畫面渲染邏輯 ---
+
+  // 1. 如果是管理員訂單模式
+  if (appMode === 'admin') {
     return <AdminOrders />;
   }
 
+  // 2. 如果是現場試穿與合約列印模式
+  if (appMode === 'fitting') {
+    return <FittingForm />;
+  }
+
+  // 3. 預設模式：一般顧客預約流程
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
       <header className="bg-emerald-600 text-white p-4 shadow-md">
