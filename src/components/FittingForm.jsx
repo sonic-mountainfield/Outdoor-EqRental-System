@@ -63,31 +63,45 @@ const FittingForm = () => {
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
-        <h2 className="text-3xl font-bold mb-8 text-gray-800 border-b-4 border-green-500 pb-2 inline-block">現場試穿與合約建立</h2>
+        <h2 className="text-3xl font-bold mb-8 text-gray-800 border-b-4 border-emerald-500 pb-2 inline-block">現場試穿與合約建立</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">客戶姓名</label>
-            <input name="customerName" onChange={handleChange} className="w-full border-2 border-gray-300 p-3 rounded-lg focus:border-green-500 focus:outline-none" type="text" placeholder="輸入客戶姓名" />
+            <input name="customerName" onChange={handleChange} className="w-full border-2 border-gray-300 p-3 rounded-lg focus:border-emerald-500 focus:outline-none" type="text" placeholder="輸入客戶姓名" />
           </div>
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">活動日期</label>
-            <select name="activityDate" onChange={handleChange} className="w-full border-2 border-gray-300 p-3 rounded-lg focus:border-green-500 focus:outline-none">
-              <option value="">請選擇日期</option>
-              <option value="2024-07-01 玉山團">2024-07-01 玉山團</option>
-              <option value="2024-07-15 雪山團">2024-07-15 雪山團</option>
-              <option value="2024-08-10 嘉明湖">2024-08-10 嘉明湖</option>
+            <select name="activityDate" onChange={handleChange} className="w-full border-2 border-gray-300 p-3 rounded-lg focus:border-emerald-500 focus:outline-none">
+              <option value="">請選擇出團日期</option>
+              <optgroup label="--- G系列 (五日) ---">
+                <option value="[G1] 7/11～7/15 富士山五日">[G1] 7/11～7/15 富士山五日</option>
+                <option value="[G2] 7/12～7/16 富士山五日">[G2] 7/12～7/16 富士山五日</option>
+                <option value="[G3] 7/26～7/30 富士山五日">[G3] 7/26～7/30 富士山五日</option>
+                <option value="[G4] 8/19～8/23 富士山五日">[G4] 8/19～8/23 富士山五日</option>
+              </optgroup>
+              <optgroup label="--- S系列 (三日) ---">
+                <option value="[S1] 7/9～7/11 富士山三日">[S1] 7/9～7/11 富士山三日</option>
+                <option value="[S2] 7/16～7/18 富士山三日">[S2] 7/16～7/18 富士山三日</option>
+                <option value="[S3] 7/23～7/25 富士山三日">[S3] 7/23～7/25 富士山三日</option>
+                <option value="[S4] 7/30～8/1 富士山三日">[S4] 7/30～8/1 富士山三日</option>
+                <option value="[S5] 8/3～8/5 富士山三日 ">[S5] 8/3～8/5 富士山三日 </option>
+                <option value="[S6] 8/23～8/25 富士山三日">[S6] 8/23～8/25 富士山三日</option>
+                <option value="[S7] 8/27～8/29 富士山三日">[S7] 8/27～8/29 富士山三日</option>
+                <option value="[SS] 9/3～9/5 富士山三日">[SS] 9/3～9/5 富士山三日</option>
+                <option value="[S8] 9/6～9/8 富士山三日">[S8] 9/6～9/8 富士山三日</option>
+              </optgroup>
             </select>
           </div>
         </div>
 
         <div className="mb-8">
           <label className="block text-sm font-bold text-gray-700 mb-2">租借套餐組合</label>
-          <select name="packageType" onChange={handleChange} className="w-full border-2 border-gray-300 p-3 rounded-lg focus:border-green-500 focus:outline-none">
+          <select name="packageType" onChange={handleChange} className="w-full border-2 border-gray-300 p-3 rounded-lg focus:border-emerald-500 focus:outline-none">
             <option value="">請選擇套餐</option>
-            <option value="A方案：新手入門包">A方案：新手入門包</option>
-            <option value="B方案：專業百岳裝備">B方案：專業百岳裝備</option>
-            <option value="C方案：輕量化單攻">C方案：輕量化單攻</option>
+            <option value="成人全套九件組">成人全套九件組</option>
+            <option value="兒童全套九件組">兒童全套九件組</option>
+            <option value="成人自由選七件組">成人自由選七件組</option>
           </select>
         </div>
 
@@ -95,8 +109,8 @@ const FittingForm = () => {
           <label className="block text-lg font-bold text-gray-800 mb-4">裝備明細勾選</label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {Object.keys(formData.items).map(item => (
-              <label key={item} className="flex items-center space-x-3 p-3 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-green-50 transition">
-                <input type="checkbox" checked={formData.items[item]} onChange={() => handleCheckboxChange(item)} className="w-5 h-5 text-green-600 focus:ring-green-500 border-gray-300 rounded" />
+              <label key={item} className="flex items-center space-x-3 p-3 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-emerald-50 transition">
+                <input type="checkbox" checked={formData.items[item]} onChange={() => handleCheckboxChange(item)} className="w-5 h-5 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded" />
                 <span className="text-gray-700 font-medium">{itemNames[item]}</span>
               </label>
             ))}
@@ -124,12 +138,13 @@ const FittingForm = () => {
 
         <button 
           onClick={handlePrint}
-          className="w-full bg-green-600 text-white font-bold text-xl py-4 rounded-lg hover:bg-green-700 transition shadow-lg hover:shadow-xl"
+          className="w-full bg-emerald-600 text-white font-bold text-xl py-4 rounded-lg hover:bg-emerald-700 transition shadow-lg hover:shadow-xl"
         >
           產生並列印雙聯確認書
         </button>
       </div>
 
+      {/* 隱藏的列印元件 */}
       <div className="hidden">
         <ContractPrint ref={componentRef} data={formData} />
       </div>
