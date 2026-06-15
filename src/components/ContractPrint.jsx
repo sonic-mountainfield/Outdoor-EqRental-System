@@ -17,10 +17,16 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
     <div className="p-8 border-2 border-gray-800 mb-4 min-h-[480px] flex flex-col justify-between">
       <div>
         <div className="flex justify-between items-end border-b-2 border-gray-800 pb-4 mb-4">
-          <h1 className="text-2xl font-bold tracking-wider">
-            裝備租借確認書 - {type === 'pickup' ? '上聯 (取件)' : '下聯 (歸還)'}
-          </h1>
-          <span className="text-sm text-gray-600">
+          <div>
+            {/* --- 新增：公司名稱抬頭 --- */}
+            <h2 className="text-lg font-bold text-gray-600 mb-1 tracking-wide">
+              TAKENO 台灣岳野登山有限公司
+            </h2>
+            <h1 className="text-2xl font-bold tracking-wider">
+              裝備租借確認書 - {type === 'pickup' ? '上聯 (取件)' : '下聯 (歸還)'}
+            </h1>
+          </div>
+          <span className="text-sm text-gray-600 mb-1">
             列印日期：{new Date().toLocaleDateString()}
           </span>
         </div>
@@ -38,13 +44,13 @@ const ContractPrint = React.forwardRef(({ data }, ref) => {
               {Object.entries(data.items)
                 .filter(([_, isChecked]) => isChecked)
                 .map(([key]) => (
-                  <li key={key} className="text-gray-800">{itemNames[key]}</li>
+                  <li key={key} className="text-gray-800 font-medium">{itemNames[key]}</li>
                 ))}
             </ul>
           </div>
           <div>
             <h3 className="font-bold bg-gray-200 p-2 mb-2">試穿確認尺寸</h3>
-            <div className="grid grid-cols-2 gap-2 text-gray-800">
+            <div className="grid grid-cols-2 gap-2 text-gray-800 font-medium">
               <p>雨衣：{data.sizes.rainCoat || '無'}</p>
               <p>雨褲：{data.sizes.rainPants || '無'}</p>
               <p>羽絨衣：{data.sizes.downJacket || '無'}</p>
